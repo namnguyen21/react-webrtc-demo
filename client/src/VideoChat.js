@@ -16,7 +16,7 @@ export default function VideoChat() {
     socketRef.current = socketIO(CONNECTION_ENDPOINT);
     const peer = new Peer(undefined);
     navigator.mediaDevices
-      .getUserMedia({ audio: true })
+      .getUserMedia({ video: true, audio: true })
       .then((stream) => setStreams((streams) => [...streams, stream]))
       .catch((err) => console.log(err));
     peer.on("open", (data) => {
@@ -40,7 +40,7 @@ export default function VideoChat() {
 
 function Video({ stream }) {
   const videoRef = useRef();
-  const video = <audio ref={videoRef} autoplay />;
+  const video = <video ref={videoRef} />;
   videoRef.current.srcObject = stream;
   videoRef.current.play();
   return video;
