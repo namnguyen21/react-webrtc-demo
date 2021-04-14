@@ -54,7 +54,7 @@ export default function VideoChat() {
           metadata: { type: "audio", callerId: myId },
         });
         const outgoingVideoCall = peer.call(userId, videoStream, {
-          metaData: { type: "video", callerId: myId },
+          metadata: { type: "video", callerId: myId },
         });
         outgoingAudioCall.on("stream", (otherStream) => {
           setPeers((peers) => {
@@ -80,7 +80,7 @@ export default function VideoChat() {
               newState[userId] = {
                 id: userId,
                 audio: undefined,
-                video: otherstream,
+                video: otherStream,
               };
             }
             return newState;
