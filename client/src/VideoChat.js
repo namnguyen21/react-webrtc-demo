@@ -50,10 +50,13 @@ export default function VideoChat() {
       // when new person joins room
       socketRef.current.on("user-connected", (userId) => {
         // call new user
-        const outgoingCall = peer.call(userId, audioStream, {
+        const outgoingAudioCall = peer.call(userId, audioStream, {
           metadata: { type: "audio", callerId: myId },
         });
-        outgoingCall.on("stream", (otherStream) => {
+        const outgoingVideoCall = peer.call(userId, videoStream, {
+          metaData: { type: "video", callerId: myId },
+        });
+        outgoingAudioCall.on("stream", (otherStream) => {
           setPeers((peers) => {
             const newState = { ...peers };
             if (userId in newState) {
@@ -63,6 +66,21 @@ export default function VideoChat() {
                 id: userId,
                 audio: otherStream,
                 video: undefined,
+              };
+            }
+            return newState;
+          });
+        });
+        outgoingVideoCall.on("stream", (otherStream) => {
+          setPeers((peers) => {
+            const newState = { ...peers };
+            if (userId in newState) {
+              newState[userId].video = otherStream;
+            } else {
+              newState[userId] = {
+                id: userId,
+                audio: undefined,
+                video: otherstream,
               };
             }
             return newState;
@@ -101,7 +119,7 @@ export default function VideoChat() {
     if (peerObjects.length === 0) return null;
     return peerObjects.map((id) => {
       if (peers[id].audio) {
-        return <Video key={id} stream={peers[id].audio} />;
+        return <Audio key={id} stream={peers[id].audio} />;
       }
     });
   }
