@@ -40,8 +40,12 @@ export default function VideoChat() {
 
 function Video({ stream }) {
   const videoRef = useRef();
-  const video = <video ref={videoRef} />;
-  videoRef.current.srcObject = stream;
-  videoRef.current.play();
-  return video;
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play();
+    }
+  }, [videoRef.current]);
+
+  return <video ref={videoRef} />;
 }
