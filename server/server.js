@@ -10,8 +10,11 @@ const io = require("socket.io")(server, {
 
 io.on("connection", (socket) => {
   socket.on("join-room", ({ userId, roomId }) => {
-    socket.join(roomId)
-    socket.to(roomId).emit('user-connected', userId)
+    socket.join(roomId);
+
+    // returns set of clients in roomId
+    const clients = io.sockets.adapter.rooms.get(roomId);
+    socket.to(roomId).emit("user-connected", userId);
   });
 });
 
