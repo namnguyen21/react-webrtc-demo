@@ -14,6 +14,7 @@ export default function VideoChat() {
   const [myAudioStream, setMyAudioStream] = useState();
   const [myVideoStream, setMyVideoStream] = useState();
   const [peerAudioStreams, setPeerAudioStreams] = useState([]);
+  const [peerVideoStreams, setPeerVideoStreams] = useState([]);
   const [hasJoined, setHasJoined] = useState(false);
 
   useEffect(() => {
@@ -61,7 +62,6 @@ export default function VideoChat() {
     const devices = await navigator.mediaDevices.enumerateDevices();
     let hasAudio = false;
     let hasVideo = false;
-    console.log(devices);
     devices.forEach((d) => {
       if (d.kind === "audioinput") {
         hasAudio = true;
@@ -77,8 +77,10 @@ export default function VideoChat() {
           video: true,
           audio: true,
         });
-        setMyAudioStream(new MediaStream(stream.getAudiotracks()));
-        setMyVideoStream(new MediaStream(stream.getVideotracks()));
+        const audio = new MediaStream(stream.getAudioTracks());
+        const video = new MediaStream(stream.getVideoTracks());
+        setMyAudioStream(audio);
+        setMyVideoStream(video);
       } else if (hasAudio) {
         const audioStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
