@@ -27,17 +27,33 @@ export default function VideoChat() {
     });
     socket.current.on("user-connected", (userId) => {
       console.log(userId);
-      const audioCall = myPeer.current.call(userId, myAudioStream);
+      const audioCall = myPeer.current.call(userId, myAudioStream, {
+        metadata: { type: "audio" },
+      });
       audioCall.on("stream", (userStream) => {
         setPeerAudioStreams((streams) => [...streams, userStream]);
       });
+      const videoCall = myPeer.current.call(userId, myVideoStream, {
+        metadata: { type: "video" },
+      });
+      videoCall.on("stream", (userStream) => {
+        setPeerVideoStreams((streams) => [...streams, userStream]);
+      });
     });
     myPeer.current.on("call", (incomingCall) => {
-      console.log("getting call");
-      incomingCall.answer(myAudioStream);
-      incomingCall.on("stream", (userStream) => {
-        setPeerAudioStreams((streams) => [...streams, userStream]);
-      });
+      const { type } = incomingCall.metadata;
+      if (type === "audio") {
+        incomingCall.answer(myAudioStream);
+        incomingCall.on("stream", (userStream) => {
+          setPeerAudioStreams((streams) => [...streams, userStream]);
+        });
+      }
+      if (type === "video") {
+        incomingCall.answer(myVideoStream);
+        incomingCall.on("stream", (userStream) => {
+          setPeerVideoStreams((streams) => [...streams, userStream]);
+        });
+      }
     });
   }, [hasJoined]);
 
@@ -88,7 +104,12 @@ export default function VideoChat() {
           ? peerAudioStreams.map((s, i) => <Audio stream={s} key={i} />)
           : null}
       </div>
-      <div>{myVideoStream ? <Video stream={myVideoStream} /> : null}</div>
+      <div>
+        {myVideoStream ? <Video stream={myVideoStream} /> : null}
+        {peerVideoStreams.length > 0
+          ? peerVideoStreams.map((s, i) => <Video stream={s} key={i} />)
+          : null}
+      </div>
     </div>
   );
 }
